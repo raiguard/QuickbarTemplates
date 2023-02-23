@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------------------------------
+Version: 2.2.1
+Date: ????
+  Changes:
+---------------------------------------------------------------------------------------------------
+Version: 2.2.0
+Date: 2020-11-23
+  Features:
+    - Added support to import templates directly from the blueprint library
+  Changes:
+    - Updated to Factorio 1.1
+---------------------------------------------------------------------------------------------------
+Version: 2.1.1
+Date: 2020-09-17
+  Bugfixes:
+    - Fixed that shift+importing didn't work whatsoever
+    - Fixed typo in changelog
+---------------------------------------------------------------------------------------------------
+Version: 2.1.0
+Date: 2020-09-17
+  Features:
+    - Shift-clicking the import button will ignore blank filters
+---------------------------------------------------------------------------------------------------
+Version: 2.0.1
+Date: 2020-09-17
+  Changes:
+    - Got off my high horse and re-introduced position-based indexing
+      - The mod will still use tags whenever possible, but now supports placing the blueprints and modifying them
+---------------------------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2020-08-19
+  Changes:
+    - Updated to Factorio 1.0
+  Bugfixes:
+    - Fixed broken import due to blueprint format changes in Factorio 1.0
+      - Due to this change, all existing template blueprints are now incompatible
+---------------------------------------------------------------------------------------------------
+Version: 1.0.4
+Date: 2020-07-01
+  Bugfixes:
+    - Fixed a crash when trying to refresh the GUI for a non-existent player
+---------------------------------------------------------------------------------------------------
+Version: 1.0.3
+Date: 2020-05-26
+  Changes:
+    - Minor style updates and code cleanup.
+---------------------------------------------------------------------------------------------------
+Version: 1.0.2
+Date: 2020-04-20
+  Changes:
+    - Use new script inventories feature to import default template instead of the cursor stack, to avoid potential conflicts with scenarios.
+---------------------------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 2020-01-24
+  Features:
+    - Updated to Factorio 0.18
+---------------------------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2019-12-31
+  Features:
+    - Initial release
