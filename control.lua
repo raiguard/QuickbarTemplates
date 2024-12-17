@@ -9,6 +9,7 @@ local function create_gui(player)
     sprite = "qt-export-blueprint-white",
     tooltip = { "qt-gui.export" },
   })
+  export_button.style.padding = 4
   local import_button = inner_panel.add({
     type = "sprite-button",
     name = "qt_import_button",
@@ -16,6 +17,7 @@ local function create_gui(player)
     sprite = "qt-import-blueprint-white",
     tooltip = { "qt-gui.import" },
   })
+  import_button.style.padding = 4
   window.visible = false
   return { window = window, export_button = export_button, import_button = import_button }
 end
@@ -37,17 +39,11 @@ local function set_gui_location(player, window)
   }
 end
 
---- @param value number
---- @return integer
-local function round(value)
-  return math.floor(value + 0.5)
-end
-
 --- @param position MapPosition
 --- @param zero_position MapPosition
 --- @return integer
 local function position_to_index(position, zero_position)
-  return round(position.x - zero_position.x) + round(zero_position.y - position.y) * 10 + 1
+  return math.floor(position.x - zero_position.x) + math.floor(zero_position.y - position.y) * 10 + 1
 end
 
 --- @param entities BlueprintEntity[]
@@ -65,30 +61,26 @@ local function get_zero_position(entities)
   return result
 end
 
+local ignored_item_names = {
+  ["blueprint"] = true,
+  ["blueprint-book"] = true,
+  ["upgrade-planner"] = true,
+  ["deconstruction-planner"] = true,
+}
+
 --- @param player LuaPlayer
 local function export_quickbar(player)
-  -- get quickbar filters
-  local get_slot = player.get_quick_bar_slot
-  --- @type ItemFilter[]
-  local filters = {}
-  for i = 1, 100 do
-    local item = get_slot(i)
-    if item and item.name ~= "blueprint" and item.name ~= "blueprint-book" then
-      filters[i] = item
-    end
-  end
-  -- assemble blueprint entities
   local entities = {}
   local pos = { x = -4, y = 4 }
   for i = 1, 100 do
-    -- add blank combinator
     entities[i] = {
       entity_number = i,
       name = "constant-combinator",
       position = { x = pos.x, y = pos.y },
     }
-    -- set combinator signal if there's a filter
-    if filters[i] ~= nil then
+
+    local item = player.get_quick_bar_slot(i)
+    if item and not ignored_item_names[item.name] then
       entities[i].control_behavior = {
         filters = {
           {
@@ -96,14 +88,14 @@ local function export_quickbar(player)
             index = 1,
             signal = {
               type = "item",
-              name = filters[i].name,
-              quality = filters[i].quality,
+              name = item.name,
+              quality = item.quality,
             },
           },
         },
       }
     end
-    -- adjust position for next entity
+
     pos.x = pos.x + 1
     if pos.x == 6 then
       pos.x = -4
@@ -158,18 +150,11 @@ local function import_quickbar(player, entities, ignore_empty)
     filters[filter_index] = { name = first_filter.name, quality = first_filter.quality }
     ::continue::
   end
-  local length = #filters
 
-  -- Floating-point imprecision can cause the positions to get messed up.
-  -- TODO: This is sus
-  local offset = length == 101 and -1 or 0
-  local start = length == 101 and 2 or 1
-
-  local set_filter = player.set_quick_bar_slot
-  for i = start, length do
+  for i = 1, 100 do
     local filter = filters[i]
     if not ignore_empty or filter then
-      set_filter(i + offset, filter)
+      player.set_quick_bar_slot(i, filter)
     end
   end
 
@@ -208,7 +193,6 @@ script.on_configuration_changed(function()
     if player then
       storage.players[i] = create_gui(player)
     else
-      -- clean up unneeded tables
       storage.players[i] = nil
     end
   end
@@ -261,10 +245,7 @@ end
 script.on_event(defines.events.on_player_cursor_stack_changed, on_cursor_stack_changed)
 
 script.on_event(
-  {
-    defines.events.on_player_display_resolution_changed,
-    defines.events.on_player_display_scale_changed,
-  },
+  { defines.events.on_player_display_resolution_changed, defines.events.on_player_display_scale_changed },
   --- @param e EventData.on_player_display_resolution_changed|EventData.on_player_display_scale_changed
   function(e)
     set_gui_location(game.players[e.player_index], storage.players[e.player_index].window)
